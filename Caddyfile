@@ -1,0 +1,31 @@
+http://0x2537.duckdns.org {
+    handle /anonymous {
+        respond "{}" 200
+    }
+ file_server
+    # 新增:从根目录提供 index.html
+    root * ./
+   try_files {path} {path}/ /index.html
+
+    handle_errors {
+        reverse_proxy https://unlimited-tribute-246920.framer.app {
+            header_up Host unlimited-tribute-246920.framer.app
+            header_up User-Agent {http.request.header.User-Agent}
+            header_up Accept {http.request.header.Accept}
+            header_up Accept-Encoding {http.request.header.Accept-Encoding}
+            header_up Accept-Language {http.request.header.Accept-Language}
+            header_up Referer https://unlimited-tribute-246920.framer.app/
+            header_up Origin https://unlimited-tribute-246920.framer.app
+
+            header_down -Content-Security-Policy
+            header_down -Content-Security-Policy-Report-Only
+        }
+        header Cache-Control "public, max-age=31536000"
+    }
+
+    log {
+        output file access.log
+        format console
+        level DEBUG
+    }
+}
